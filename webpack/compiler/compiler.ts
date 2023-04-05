@@ -2,6 +2,7 @@ import webpack from 'webpack';
 import MFS from 'memory-fs';
 import path from 'path';
 import chalk from "chalk";
+import { printStats } from "./stats";
 
 interface DevCompiler {
     configuration: webpack.Configuration;
@@ -24,7 +25,7 @@ export const createDevCompiler = ({
         }
     };
 
-    const serverMfs = new MFS();
+    // const serverMfs = new MFS();
 
     // compiler.outputFileSystem = serverMfs as any;
 
@@ -61,4 +62,17 @@ export const createDevCompiler = ({
     });
 
     return compiler;
+}
+
+export const createBuildCompiler = ({
+    configuration,
+}: DevCompiler) => {
+    const compiler = webpack(configuration);
+
+    compiler.run((err, stats) => {
+        printStats(err, stats);
+        compiler.close(() => {
+            console.log("编译完成")
+        })
+    })
 }

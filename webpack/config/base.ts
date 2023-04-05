@@ -86,23 +86,38 @@ export class WebpackBaseConfig {
             .test(/\.css$/i)
             .use('style-loader')
             .loader(require.resolve('style-loader'))
-         config
-            .module
-            .rule('css')
-            .test(/\.css$/i)
+            .end()
             .use('css-loader')
             .loader(require.resolve('css-loader'))
-
-        config
-            .module
-            .rule('css')
-            .test(/\.css$/i)
+            .end()
             .use('esbuild-loader')
             .loader(require.resolve('esbuild-loader'))
             .options({
+                loader: 'css',
                 minify: true,
                 implementation: require("esbuild")
             });
+
+        config
+            .module
+            .rule('images')
+            .test(/\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/)
+            .use('url-loader')
+            .loader(require.resolve('url-loader'))
+            .options({
+                limit: 1000000
+            })
+            .end();
+        config
+            .module
+            .rule('svg')
+            .test(/\.svg(\?.*)?$/)
+            .use('svg-url-loader')
+            .loader(require.resolve('svg-url-loader'))
+            .options({
+                encoding: "base64"
+            })
+            .end();
     }
 
     public injectPlugins() {
@@ -117,6 +132,7 @@ export class WebpackBaseConfig {
             .use(HtmlWebpackPlugin, [{
                 template: "ui.html",
                 filename: "ui.html",
+                inject: 'body',
                 cache: false,
             }])
             .end()

@@ -1,7 +1,6 @@
+import { createApp } from 'vue';
 import './index.css';
+import App from "./app.vue";
 console.log('11111119999');
 
-export default () => {
-    console.log('777777771117888555599');
-    return;
-}
+createApp(App).mount("#app");

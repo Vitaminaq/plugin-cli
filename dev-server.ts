@@ -1,5 +1,5 @@
 // import { WebSocketServer } from 'ws';
-import { createCompiler } from './webpack/service';
+import { devCompiler, buildCompiler } from './webpack/service';
 
 // const wss = new WebSocketServer({ port: 3000 });
 
@@ -21,4 +21,6 @@ import { createCompiler } from './webpack/service';
 //     console.log("========= wss error ==========", e);
 // });
 
-createCompiler();
+devCompiler();
+
+// buildCompiler();
