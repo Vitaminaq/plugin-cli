@@ -1,8 +1,8 @@
 import Config from 'webpack-chain';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import WebpackBar from 'webpackbar';
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import path from "path";
+import HtmlInlineScriptPlugin from '../plugin/html-inline-scripts';
 
 const root = process.cwd();
 
@@ -11,6 +11,16 @@ export class WebpackBaseConfig {
 
     public constructor() {
         const { config } = this;
+        config
+            .entry("ui")
+            .add("./src/index.ts")
+            .end()
+            .entry("core")
+            .add("./core.ts")
+            .end()
+        config.output
+            .path(path.resolve(root, "./dist"))
+            .end();
         config.resolve
             .extensions
             .merge(['.mjs', '.js', '.jsx', '.vue', '.json', '.wasm'])
@@ -20,6 +30,10 @@ export class WebpackBaseConfig {
 
         this.injectRules();
         this.injectPlugins();
+    }
+
+    public get configuration() {
+        return this.config.toConfig();
     }
 
     public injectRules() {
@@ -101,12 +115,17 @@ export class WebpackBaseConfig {
             .end()
             .plugin('html')
             .use(HtmlWebpackPlugin, [{
-                template: "index.html",
-                filename: "index.html",
-                // inject: false,
+                template: "ui.html",
+                filename: "ui.html",
                 cache: false,
             }])
             .end()
-        // this.config.optimization.minimizer('js').use(EsbuildPlugin)
+            .plugin('inline-script')
+            .use(HtmlInlineScriptPlugin, [{
+                scriptMatchPattern: [/ui.js$/],
+                htmlMatchPattern: [/ui.html$/],
+                ignoredScriptMatchPattern: [/core.js$/]
+            }])
+            .end();
     }
 }

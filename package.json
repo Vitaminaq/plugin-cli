@@ -21,7 +21,7 @@
     "jiti": "^1.18.2",
     "koa": "^2.14.1",
     "memory-fs": "^0.5.0",
-    "mini-css-extract-plugin": "^2.7.5",
+    "rimraf": "^4.4.1",
     "style-loader": "^3.3.2",
     "swc-loader": "^0.2.3",
     "webpack": "^5.77.0",
