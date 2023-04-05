@@ -1,0 +1,21 @@
+{
+  "name": "plugin-demo",
+  "version": "1.0.0",
+  "description": "plugin demo",
+  "main": "index.js",
+  "sideEffects": [
+    "./core.ts"
+  ],
+  "scripts": {
+    "dev": "plugin-cli dev",
+    "build": "plugin-cli build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "@plugin/cli": "workspace:*"
+  }
+}

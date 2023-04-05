@@ -3,8 +3,9 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import WebpackBar from 'webpackbar';
 import path from "path";
 import HtmlInlineScriptPlugin from '../plugin/html-inline-scripts';
+import { root } from '../../config';
 
-const root = process.cwd();
+const isProd = process.env.NODE_ENV === 'production';
 
 export class WebpackBaseConfig {
     public config = new Config();
