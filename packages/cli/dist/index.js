@@ -181,11 +181,12 @@ var html_inline_scripts_default = HtmlInlineScriptPlugin;
 var root = process.cwd();
 
 // lib/webpack/config/base.ts
-var isProd = process.env.NODE_ENV === "production";
 var WebpackBaseConfig = class {
   constructor() {
     this.config = new import_webpack_chain.default();
     const { config } = this;
+    config.mode("production").devtool(false);
+    config.optimization.usedExports(false);
     config.entry("ui").add("./src/index.ts").end().entry("core").add("./core.ts").end();
     config.output.path(import_path.default.resolve(root, "./dist")).end();
     config.resolve.extensions.merge([".mjs", ".js", ".jsx", ".vue", ".json", ".wasm"]).end().alias.set("@", import_path.default.resolve(root, "./src"));
@@ -256,24 +257,6 @@ var WebpackBaseConfig = class {
   }
 };
 
-// lib/webpack/config/dev.ts
-var WebpackDevConfig = class extends WebpackBaseConfig {
-  constructor() {
-    super();
-    this.config.mode("production").devtool(false);
-    this.config.optimization.sideEffects(false).usedExports(false);
-  }
-};
-
-// lib/webpack/config/build.ts
-var WebpackBuildConfig = class extends WebpackBaseConfig {
-  constructor() {
-    super();
-    this.config.mode("production").devtool(false);
-    this.config.optimization.usedExports(false);
-  }
-};
-
 // lib/webpack/compiler/compiler.ts
 var import_webpack2 = __toESM(require("webpack"));
 var import_memory_fs = __toESM(require("memory-fs"));
@@ -312,23 +295,57 @@ var printStats = (err, stats) => {
   return true;
 };
 
+// lib/dev-server/server.ts
+var import_ws = require("ws");
+var DevServer = class {
+  constructor() {
+    this.pool = [];
+    this.messages = /* @__PURE__ */ new Map();
+    const wss = new import_ws.WebSocketServer({ port: 3e3 });
+    wss.on("connection", (socket) => {
+      this.pool.push(socket);
+      this.messages.forEach((content, name) => {
+        socket.send(JSON.stringify({ name, content }));
+      });
+      socket.on("message", (raw) => {
+        console.log("========= message =======", raw);
+      });
+      socket.on("error", (err) => {
+        console.log("========== error ============", err);
+      });
+      socket.send(JSON.stringify({ type: "connected" }));
+    });
+    wss.on("error", (e) => {
+      console.log("========= wss error ==========", e);
+    });
+  }
+  static get instance() {
+    if (!DevServer._instance) {
+      DevServer._instance = new DevServer();
+    }
+    return DevServer._instance;
+  }
+  update(name, content) {
+    this.messages.set(name, content);
+    this.pool.forEach((socket) => socket.send(JSON.stringify({
+      name,
+      content
+    })));
+  }
+};
+
 // lib/webpack/compiler/compiler.ts
-var updateManifest = (socket) => {
+var updateManifest = () => {
   let str = "";
   try {
     str = import_fs.default.readFileSync(import_path2.default.resolve(root, "./manifest.json"), { encoding: "utf-8" });
   } catch (e) {
     str = "";
   }
-  const res = [{
-    name: "manifest",
-    content: str
-  }];
-  socket == null ? void 0 : socket.send(JSON.stringify(res));
+  DevServer.instance.update("manifest", str);
 };
 var createDevCompiler = ({
-  configuration,
-  socket
+  configuration
 }) => {
   const compiler = (0, import_webpack2.default)(configuration);
   const readFile = (fs2, file) => {
@@ -346,13 +363,13 @@ var createDevCompiler = ({
   compiler.outputFileSystem = serverMfs;
   import_chokidar.default.watch("./manifest.json").on("add", () => {
     console.log(import_chalk2.default.green("[plugin-cli]: "), "manifest.json created");
-    updateManifest(socket);
+    updateManifest();
   }).on("change", () => {
     console.log(import_chalk2.default.green("[plugin-cli]: "), "manifest.json change");
-    updateManifest(socket);
+    updateManifest();
   }).on("unlink", () => {
     console.log(import_chalk2.default.green("[plugin-cli]: "), "manifest.json unlink");
-    updateManifest(socket);
+    updateManifest();
   });
   compiler.watch({}, (err, stats) => {
     var _a, _b;
@@ -381,14 +398,8 @@ var createDevCompiler = ({
       return;
     const uiHtml = readFile(serverMfs, "ui.html");
     const core = readFile(serverMfs, "core.js");
-    const res = [{
-      name: "ui-html",
-      content: uiHtml
-    }, {
-      name: "core",
-      content: core
-    }];
-    socket == null ? void 0 : socket.send(JSON.stringify(res));
+    DevServer.instance.update("ui-html", uiHtml);
+    DevServer.instance.update("core", core);
   });
   return compiler;
 };
@@ -416,20 +427,19 @@ var mergeVueConfig = (config) => {
 };
 
 // lib/webpack/service.ts
-var devCompiler = (socket) => {
-  const webpackDevConfig = new WebpackDevConfig();
+var devCompiler = () => {
+  const webpackDevConfig = new WebpackBaseConfig();
   mergeVueConfig(webpackDevConfig.config);
   const { configuration } = webpackDevConfig;
   if (configuration.output && configuration.output.path) {
     import_rimraf.default.sync(configuration.output.path);
   }
   return createDevCompiler({
-    configuration,
-    socket
+    configuration
   });
 };
 var buildCompiler = () => {
-  const webpackBuildConfig = new WebpackBuildConfig();
+  const webpackBuildConfig = new WebpackBaseConfig();
   mergeVueConfig(webpackBuildConfig.config);
   const { configuration } = webpackBuildConfig;
   if (configuration.output && configuration.output.path) {
@@ -440,29 +450,16 @@ var buildCompiler = () => {
   });
 };
 
-// lib/dev-server.ts
-var import_ws = require("ws");
-var createDevServer = () => {
-  const wss = new import_ws.WebSocketServer({ port: 3e3 });
-  wss.on("connection", (socket) => {
-    socket.on("message", (raw) => {
-      console.log("========= message =======", raw);
-    });
-    socket.on("error", (err) => {
-      console.log("========== error ============", err);
-    });
-    socket.send(JSON.stringify({ type: "connected" }));
-    devCompiler(socket);
-  });
-  wss.on("error", (e) => {
-    console.log("========= wss error ==========", e);
-  });
+// lib/index.ts
+var devServer = () => {
+  devCompiler();
+  DevServer.instance;
 };
 
 // index.ts
 var cli = (0, import_cac.cac)("plugin-cli");
 cli.command("[root]").alias("dev").action(() => {
-  createDevServer();
+  devServer();
 });
 cli.command("build [root]").action(() => {
   buildCompiler();

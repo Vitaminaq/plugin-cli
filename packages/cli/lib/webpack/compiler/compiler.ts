@@ -5,15 +5,15 @@ import fs from 'fs';
 import chalk from "chalk";
 import chokidar from "chokidar";
 import { printStats } from "./stats";
-import type { WebSocket } from 'ws';
 import { root } from '../../config';
+import { DevServer } from '../../dev-server/server';
 
 interface SocketResponseItem {
     name: 'manifest' | 'ui-html' | 'core';
     content: string;
 }
 
-const updateManifest = (socket?: WebSocket) => {
+const updateManifest = () => {
     let str = '';
     try {
        str = fs.readFileSync(path.resolve(root, "./manifest.json"), { encoding: 'utf-8' })
@@ -21,26 +21,16 @@ const updateManifest = (socket?: WebSocket) => {
         str = '';
     }
 
-    const res: SocketResponseItem[] = [{
-        name: 'manifest',
-        content: str
-    }];
-
-    socket?.send(JSON.stringify(res));
+    DevServer.instance.update('manifest', str);
 }
 
 interface CompilerOptions {
     configuration: webpack.Configuration;
 }
 
-interface DevCompilerOptions extends CompilerOptions {
-    socket?: WebSocket
-}
-
 export const createDevCompiler = ({
-    configuration,
-    socket
-}: DevCompilerOptions) => {
+    configuration
+}: CompilerOptions) => {
     const compiler = webpack(configuration);
 
     const readFile = (fs, file) => {
@@ -63,15 +53,15 @@ export const createDevCompiler = ({
         .watch("./manifest.json")
         .on("add", () => {
             console.log(chalk.green("[plugin-cli]: "), 'manifest.json created');
-            updateManifest(socket);
+            updateManifest();
         })
         .on("change", () => {
             console.log(chalk.green("[plugin-cli]: "), 'manifest.json change');
-            updateManifest(socket);
+            updateManifest();
         })
         .on("unlink", () => {
             console.log(chalk.green("[plugin-cli]: "), 'manifest.json unlink');
-            updateManifest(socket);
+            updateManifest();
         });
 
     compiler.watch({}, (err, stats) => {
@@ -102,17 +92,10 @@ export const createDevCompiler = ({
         if (stats.hasErrors()) return;
 
         const uiHtml = readFile(serverMfs, 'ui.html');
-        const core = readFile(serverMfs, 'core.js');
+        const core = readFile(serverMfs, 'core.js')
 
-        const res: SocketResponseItem[] = [{
-            name: 'ui-html',
-            content: uiHtml
-        }, {
-            name: 'core',
-            content: core
-        }];
-
-        socket?.send(JSON.stringify(res));
+        DevServer.instance.update('ui-html', uiHtml);
+        DevServer.instance.update('core', core);
     });
 
     return compiler;

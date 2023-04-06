@@ -8,21 +8,21 @@ onMounted(() => {
   const socket = new WebSocket('ws://127.0.0.1:3000/');
 
   socket.addEventListener('message', function (event) {
-    const res = JSON.parse(event.data);
-    if (!Array.isArray(res)) return;
+    const data: any = JSON.parse(event.data);
 
-    res.forEach(item => {
-      if (item.name === 'ui-html') {
+    if (!data.name) return;
+
+      if (data.name === 'ui-html') {
         console.log('ui-html');
 
         if (contain) {
-          contain.src = window.URL.createObjectURL(new Blob([item.content], { type: 'text/html' }));
+          contain.src = window.URL.createObjectURL(new Blob([data.content], { type: 'text/html' }));
         }
       }
-      if (item.name === 'core') {
-        console.log('core', item.content);
+      if (data.name === 'core') {
+        console.log('core', data.content);
         getQuickJS().then(QuickJS => {
-          const res = QuickJS.evalCode(item.content, {
+          const res = QuickJS.evalCode(data.content, {
             shouldInterrupt: shouldInterruptAfterDeadline(Date.now() + 1000),
             memoryLimitBytes: 1024 * 1024,
           });
@@ -30,10 +30,9 @@ onMounted(() => {
           console.log('quickJs执行结果：', res);
         });
       }
-      if (item.name === 'manifest') {
+      if (data.name === 'manifest') {
         console.log('manifest');
       }
-    });
   });
 
   socket.addEventListener('open', function (event) {

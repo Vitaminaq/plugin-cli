@@ -1,6 +1,5 @@
 import { cac } from "cac";
-import { buildCompiler } from './lib/webpack/service';
-import { createDevServer } from './lib/dev-server';
+import { buildCompiler, devServer } from './lib';
 
 const cli = cac("plugin-cli");
 
@@ -8,7 +7,7 @@ cli
     .command("[root]")
     .alias("dev")
     .action(() => {
-        createDevServer();
+        devServer();
     });
 
 cli

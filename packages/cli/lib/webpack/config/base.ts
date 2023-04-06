@@ -5,13 +5,17 @@ import path from "path";
 import HtmlInlineScriptPlugin from '../plugin/html-inline-scripts';
 import { root } from '../../config';
 
-const isProd = process.env.NODE_ENV === 'production';
-
 export class WebpackBaseConfig {
     public config = new Config();
 
     public constructor() {
         const { config } = this;
+        config
+            .mode("production")
+            .devtool(false);
+        config
+            .optimization
+            .usedExports(false);
         config
             .entry("ui")
             .add("./src/index.ts")
