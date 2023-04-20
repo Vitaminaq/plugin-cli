@@ -1,11 +1,6 @@
 import type Config from 'webpack-chain';
 
 export const mergeVueConfig = (config: Config) => {
-    // config
-    //     .resolve
-    //     .alias
-    //     .set('vue$', 'vue/dist/vue.esm-bundler.js');
-
     config
         .module
         .rule('vue')
@@ -18,15 +13,6 @@ export const mergeVueConfig = (config: Config) => {
         .use(require('vue-loader').VueLoaderPlugin);
 
     config.module.rules.get("css").uses.delete("style-loader")
-
-    // config
-    //     .module
-    //     .rule('css')
-    //     .test(/\.css$/i)
-    //     .oneOf('vue')
-    //     .resourceQuery(/\?vue/)
-    //     .use('vue-style-loader')
-    //     .loader(require.resolve('vue-style-loader'));
 
     config
         .module

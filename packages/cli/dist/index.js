@@ -78,104 +78,9 @@ var import_cac = require("cac");
 
 // lib/webpack/config/base.ts
 var import_webpack_chain = __toESM(require("webpack-chain"));
-var import_html_webpack_plugin2 = __toESM(require("html-webpack-plugin"));
+var import_html_webpack_plugin = __toESM(require("html-webpack-plugin"));
 var import_webpackbar = __toESM(require("webpackbar"));
 var import_path = __toESM(require("path"));
-
-// lib/webpack/plugin/html-inline-scripts.ts
-var import_webpack = require("webpack");
-var import_html_webpack_plugin = __toESM(require("html-webpack-plugin"));
-var PLUGIN_PREFIX = "HtmlInlineScriptPlugin";
-var HtmlInlineScriptPlugin = class {
-  constructor(options = {}) {
-    if (options && Array.isArray(options)) {
-      console.error(
-        "\x1B[35m%s \x1B[31m%s %s\x1B[0m",
-        "[html-inline-script-webpack-plugin]",
-        "Options is now an object containing `scriptMatchPattern` and `htmlMatchPattern` in version 3.x.",
-        "Please refer to documentation for more information."
-      );
-      throw new Error("OPTIONS_PATTERN_UNMATCHED");
-    }
-    const {
-      scriptMatchPattern = [/.+[.]js$/],
-      htmlMatchPattern = [/.+[.]html$/],
-      ignoredScriptMatchPattern = []
-    } = options;
-    this.scriptMatchPattern = scriptMatchPattern;
-    this.htmlMatchPattern = htmlMatchPattern;
-    this.ignoredScriptMatchPattern = ignoredScriptMatchPattern;
-    this.processedScriptFiles = [];
-    this.ignoredHtmlFiles = [];
-  }
-  isFileNeedsToBeInlined(assetName) {
-    return this.scriptMatchPattern.some((test) => assetName.match(test));
-  }
-  isIgnoreInjectScript(src) {
-    return this.ignoredScriptMatchPattern.some((test) => src.match(test));
-  }
-  shouldProcessHtml(templateName) {
-    return this.htmlMatchPattern.some((test) => templateName.match(test));
-  }
-  processScriptTag(publicPath, assets, tag) {
-    var _a;
-    if (tag.tagName !== "script" || !((_a = tag.attributes) == null ? void 0 : _a.src)) {
-      return tag;
-    }
-    const scriptName = decodeURIComponent(tag.attributes.src.replace(publicPath, ""));
-    if (!this.isFileNeedsToBeInlined(scriptName)) {
-      return tag;
-    }
-    const asset = assets[scriptName];
-    if (!asset) {
-      return tag;
-    }
-    const { src, ...attributesWithoutSrc } = tag.attributes;
-    this.processedScriptFiles.push(scriptName);
-    return {
-      tagName: "script",
-      innerHTML: asset.source().replace(/(<)(\/script>)/g, "\\x3C$2"),
-      voidTag: false,
-      attributes: attributesWithoutSrc,
-      meta: { plugin: "html-inline-script-webpack-plugin" }
-    };
-  }
-  apply(compiler) {
-    var _a, _b;
-    let publicPath = ((_b = (_a = compiler.options) == null ? void 0 : _a.output) == null ? void 0 : _b.publicPath) || "";
-    if (publicPath && !publicPath.endsWith("/")) {
-      publicPath += "/";
-    }
-    compiler.hooks.compilation.tap(`${PLUGIN_PREFIX}_compilation`, (compilation) => {
-      const hooks = import_html_webpack_plugin.default.getHooks(compilation);
-      hooks.alterAssetTags.tap(`${PLUGIN_PREFIX}_alterAssetTags`, (data) => {
-        var _a2;
-        const htmlFileName = (_a2 = data.plugin.options) == null ? void 0 : _a2.filename;
-        if (htmlFileName && !this.shouldProcessHtml(htmlFileName)) {
-          this.ignoredHtmlFiles.push(htmlFileName);
-          return data;
-        }
-        data.assetTags.scripts = data.assetTags.scripts.filter((tag) => {
-          return !this.isIgnoreInjectScript(tag.attributes.src);
-        }).map(
-          (tag) => this.processScriptTag(publicPath, compilation.assets, tag)
-        );
-        return data;
-      });
-      compilation.hooks.processAssets.tap({
-        name: `${PLUGIN_PREFIX}_PROCESS_ASSETS_STAGE_SUMMARIZE`,
-        stage: import_webpack.Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE
-      }, (assets) => {
-        if (this.ignoredHtmlFiles.length === 0) {
-          this.processedScriptFiles.forEach((assetName) => {
-            delete assets[assetName];
-          });
-        }
-      });
-    });
-  }
-};
-var html_inline_scripts_default = HtmlInlineScriptPlugin;
 
 // lib/config.ts
 var root = process.cwd();
@@ -244,21 +149,17 @@ var WebpackBaseConfig = class {
     this.config.plugin("progress").use(import_webpackbar.default, [{
       name: "plugin",
       color: "green"
-    }]).end().plugin("html").use(import_html_webpack_plugin2.default, [{
+    }]).end().plugin("html").use(import_html_webpack_plugin.default, [{
       template: "ui.html",
-      filename: "ui.html",
-      inject: "body",
-      cache: false
-    }]).end().plugin("inline-script").use(html_inline_scripts_default, [{
-      scriptMatchPattern: [/ui.js$/],
-      htmlMatchPattern: [/ui.html$/],
-      ignoredScriptMatchPattern: [/core.js$/]
+      filename: "ui.html"
+      // inject: 'body',
+      // cache: false,
     }]).end();
   }
 };
 
 // lib/webpack/compiler/compiler.ts
-var import_webpack2 = __toESM(require("webpack"));
+var import_webpack = __toESM(require("webpack"));
 var import_memory_fs = __toESM(require("memory-fs"));
 var import_path2 = __toESM(require("path"));
 var import_fs = __toESM(require("fs"));
@@ -354,7 +255,7 @@ var updateManifest = () => {
 var createDevCompiler = ({
   configuration
 }) => {
-  const compiler = (0, import_webpack2.default)(configuration);
+  const compiler = (0, import_webpack.default)(configuration);
   const readFile = (fs2, file) => {
     try {
       return fs2.readFileSync(
@@ -413,7 +314,7 @@ var createDevCompiler = ({
 var createBuildCompiler = ({
   configuration
 }) => {
-  const compiler = (0, import_webpack2.default)(configuration);
+  const compiler = (0, import_webpack.default)(configuration);
   compiler.run((err, stats) => {
     printStats(err, stats);
     compiler.close(() => {

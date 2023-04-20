@@ -1,8 +1,6 @@
 import Config from 'webpack-chain';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 import WebpackBar from 'webpackbar';
 import path from "path";
-import HtmlInlineScriptPlugin from '../plugin/html-inline-scripts';
 import { root } from '../../config';
 
 export class WebpackBaseConfig {
@@ -16,13 +14,6 @@ export class WebpackBaseConfig {
         config
             .optimization
             .usedExports(false);
-        config
-            .entry("ui")
-            .add("./src/index.ts")
-            .end()
-            .entry("core")
-            .add("./core.ts")
-            .end()
         config.output
             .path(path.resolve(root, "./dist"))
             .end();
@@ -131,21 +122,6 @@ export class WebpackBaseConfig {
             .use(WebpackBar, [{
                 name: 'plugin',
                 color: 'green'
-            }])
-            .end()
-            .plugin('html')
-            .use(HtmlWebpackPlugin, [{
-                template: "ui.html",
-                filename: "ui.html",
-                inject: 'body',
-                cache: false,
-            }])
-            .end()
-            .plugin('inline-script')
-            .use(HtmlInlineScriptPlugin, [{
-                scriptMatchPattern: [/ui.js$/],
-                htmlMatchPattern: [/ui.html$/],
-                ignoredScriptMatchPattern: [/core.js$/]
             }])
             .end();
     }

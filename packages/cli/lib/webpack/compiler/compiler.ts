@@ -8,10 +8,17 @@ import { printStats } from "./stats";
 import { root } from '../../config';
 import { DevServer } from '../../dev-server/server';
 
-interface SocketResponseItem {
-    name: 'manifest' | 'ui-html' | 'core';
-    content: string;
-}
+const readMFSFile = (fs, path, file) => {
+    try {
+        return fs.readFileSync(
+            path.join(path, file),
+            'utf-8'
+        );
+    } catch (e) {
+        console.log("read dist fail", e);
+        return '';
+    }
+};
 
 const updateManifest = () => {
     let str = '';
@@ -24,32 +31,8 @@ const updateManifest = () => {
     DevServer.instance.update('manifest', str);
 }
 
-interface CompilerOptions {
-    configuration: webpack.Configuration;
-}
-
-export const createDevCompiler = ({
-    configuration
-}: CompilerOptions) => {
-    const compiler = webpack(configuration);
-
-    const readFile = (fs, file) => {
-        try {
-            return fs.readFileSync(
-                path.join(compiler.outputPath, file),
-                'utf-8'
-            );
-        } catch (e) {
-            console.log("read dist fail", e);
-            return '';
-        }
-    };
-
-    const serverMfs = new MFS();
-
-    compiler.outputFileSystem = serverMfs as any;
-
-    chokidar
+const watchManifest = () => {
+    return chokidar
         .watch("./manifest.json")
         .on("add", () => {
             console.log(chalk.green("[plugin-cli]: "), 'manifest.json created');
@@ -63,6 +46,40 @@ export const createDevCompiler = ({
             console.log(chalk.green("[plugin-cli]: "), 'manifest.json unlink');
             updateManifest();
         });
+}
+
+export const compilerMain = ({
+    configuration,
+}: CompilerOptions) => {
+    const compiler = webpack(configuration);
+
+    const serverMfs = new MFS();
+
+    compiler.outputFileSystem = serverMfs as any;
+
+    compiler.run((err, stats) => {
+        printStats(err, stats);
+        compiler.close(() => {
+            const mainCode = readMFSFile(serverMfs, compiler.outputPath, 'main.js');
+            DevServer.instance.update('main', mainCode);
+        });
+    });
+}
+
+interface CompilerOptions {
+    configuration: webpack.Configuration;
+}
+
+export const createDevCompiler = ({
+    configuration
+}: CompilerOptions) => {
+    const compiler = webpack(configuration);
+
+    const serverMfs = new MFS();
+
+    compiler.outputFileSystem = serverMfs as any;
+
+    watchManifest();
 
     compiler.watch({}, (err, stats) => {
         if (err) {
@@ -91,11 +108,9 @@ export const createDevCompiler = ({
 
         if (stats.hasErrors()) return;
 
-        const uiHtml = readFile(serverMfs, 'ui.html');
-        const core = readFile(serverMfs, 'core.js')
+        const uiHtml = readMFSFile(serverMfs, compiler.outputPath, 'ui.html');
 
         DevServer.instance.update('ui-html', uiHtml);
-        DevServer.instance.update('core', core);
     });
 
     return compiler;

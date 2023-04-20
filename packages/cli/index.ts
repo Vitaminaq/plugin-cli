@@ -1,5 +1,5 @@
 import { cac } from "cac";
-import { buildCompiler, devServer } from './lib';
+import { build, devServer } from './lib';
 
 const cli = cac("plugin-cli");
 
@@ -13,7 +13,7 @@ cli
 cli
     .command("build [root]")
     .action(() => {
-        buildCompiler();
+        build();
     });
 
 cli.help();
