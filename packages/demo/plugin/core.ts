@@ -1,3 +1,7 @@
-const a = '1 + 1'
+pixso.showUI(__html__);
 
-export default a;
+pixso.on("run", (options) => {
+    console.log(options, '111111111111111')
+});
+
+pixso.notify("我更新了11188")
