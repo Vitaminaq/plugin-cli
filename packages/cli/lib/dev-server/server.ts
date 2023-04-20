@@ -9,8 +9,9 @@ export class DevServer {
         return DevServer._instance;
     }
 
-    public pool: WebSocket[] = [];
-    public messages = new Map();
+    public pool: WebSocket[] = []; // socket池
+    public messages = new Map(); // 构建产物池
+    public updates = []; // 更新队列
 
     public constructor() {
         const wss = new WebSocketServer({ port: 3000 });
@@ -37,6 +38,8 @@ export class DevServer {
     }
 
     public update(name: string, content: string) {
+        const msg = this.messages.get(name);
+        if (msg && msg === content) return;
         this.messages.set(name, content);
         this.pool.forEach(socket => socket.send(JSON.stringify({
             name,

@@ -298,9 +298,13 @@ var printStats = (err, stats) => {
 // lib/dev-server/server.ts
 var import_ws = require("ws");
 var DevServer = class {
+  // 更新队列
   constructor() {
     this.pool = [];
+    // socket池
     this.messages = /* @__PURE__ */ new Map();
+    // 构建产物池
+    this.updates = [];
     const wss = new import_ws.WebSocketServer({ port: 3e3 });
     wss.on("connection", (socket) => {
       this.pool.push(socket);
@@ -326,6 +330,9 @@ var DevServer = class {
     return DevServer._instance;
   }
   update(name, content) {
+    const msg = this.messages.get(name);
+    if (msg && msg === content)
+      return;
     this.messages.set(name, content);
     this.pool.forEach((socket) => socket.send(JSON.stringify({
       name,
