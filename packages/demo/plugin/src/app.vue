@@ -7,7 +7,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
-const count = ref(10);
+const count = ref(1);
 
 const onClick = () => {
     count.value ++;
@@ -17,6 +17,6 @@ const onClick = () => {
 .vue-contain {
     height: 100px;
     width: 100px;
-    background-color: green;
+    background-color: blue;
 }
 </style>

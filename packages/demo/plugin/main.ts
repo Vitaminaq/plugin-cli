@@ -1,7 +1,10 @@
-pixso.showUI(__html__);
+pixso.showUI(__html__, {
+    height: 930,
+    width: 580
+});
 
 pixso.on("run", (options) => {
-    console.log(options, '11111111111111')
+    console.log(options, '1111')
 });
 
 pixso.notify("我更新了")

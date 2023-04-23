@@ -3,11 +3,11 @@ import { createHooks } from 'hookable';
 
 export const root = process.cwd();
 
-interface UserConfig {
+export interface UserConfig {
     ui?: string;
-    main: string;
+    main?: string;
     mainBuild?: boolean;
-    manifest: string;
+    manifest?: string;
     chainWebpack?: Function;
     configureWebpack?: Object | Function;
     frame?: 'vue' | 'react' | 'none';

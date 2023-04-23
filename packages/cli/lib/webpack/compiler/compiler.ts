@@ -7,7 +7,7 @@ import { printStats } from "./stats";
 import { root, hooks, isBuild } from '../../config';
 import { watchFile } from "../../utils";
 
-const readMFSFile = (fs, p, file) => {
+const readMFSFile = (fs: MFS, p: string, file: string) => {
     try {
         return fs.readFileSync(
             path.join(p, file),
@@ -38,10 +38,10 @@ export const compilerMain = (
     const compiler = webpack(configuration);
 
     const build = () => {
-        let serverMfs;
+        let serverMfs: MFS;
         if (!isBuild) {
             serverMfs = new MFS();
-            compiler.outputFileSystem = serverMfs as any;
+            compiler.outputFileSystem = serverMfs;
         }
     
         compiler.run((err, stats) => {
@@ -64,10 +64,10 @@ export const compilerUI = (
 ) => {
     const compiler = webpack(configuration);
 
-    let serverMfs;
+    let serverMfs: MFS;
     if (!isBuild) {
         serverMfs = new MFS();
-        compiler.outputFileSystem = serverMfs as any;
+        compiler.outputFileSystem = serverMfs;
     }
 
     if (isBuild)
