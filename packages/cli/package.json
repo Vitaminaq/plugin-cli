@@ -1,5 +1,5 @@
 {
-  "name": "@plugin/cli",
+  "name": "@pixso/plugin-cli-beta",
   "version": "1.0.0",
   "description": "plugin cli",
   "bin": {

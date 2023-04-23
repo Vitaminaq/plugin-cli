@@ -1,6 +1,6 @@
 import chokidar from "chokidar";
 
-export const watchFile = (path: string, callback: () => any) => {
+export const watchFile = (path: string, callback: (path: string) => any) => {
     return chokidar
         .watch(path)
         .on("add", callback)

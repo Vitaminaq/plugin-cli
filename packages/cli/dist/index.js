@@ -29,8 +29,7 @@ var import_c12 = require("c12");
 var import_hookable = require("hookable");
 var root = process.cwd();
 var isBuild = process.env.NODE_ENV === "production";
-var defineConfig = (config) => {
-};
+var defineConfig = (config) => config;
 var hooks = (0, import_hookable.createHooks)();
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

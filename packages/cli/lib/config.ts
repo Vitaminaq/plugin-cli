@@ -15,6 +15,7 @@ export interface UserConfig {
 
 export const localConfig: UserConfig = {
     main: "./main.ts",
+    mainBuild: true,
     manifest: "./manifest.json",
     frame: 'vue'
 };
@@ -39,7 +40,7 @@ export const overwriteEnv = (isBuild: boolean) => {
 
 export const isBuild = process.env.NODE_ENV === 'production';
 
-export const defineConfig = (config: UserConfig) => {};
+export const defineConfig = (config: UserConfig) => config;
 
 export type UpdateName = 'manifest' | 'main' | 'ui';
 
