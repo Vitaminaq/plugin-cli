@@ -1,15 +1,14 @@
-import { buildCompiler } from './webpack/service';
 import { DevServer } from './dev-server/server';
-import { devCompiler } from './webpack/service';
+import { compiler } from './webpack/service';
 import { loadUserConfig } from './config';
 
 export const devServer = async () => {
     await loadUserConfig();
-    devCompiler();
+    compiler();
     DevServer.instance;
 }
 
 export const build = async () => {
     await loadUserConfig();
-    buildCompiler();
+    compiler();
 }

@@ -1,7 +1,10 @@
 import Config from 'webpack-chain';
 import WebpackBar from 'webpackbar';
 import path from "path";
-import { root } from '../../config';
+import { root, localConfig } from '../config';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import HtmlInlineScriptPlugin from './plugin/html-inline-scripts';
+import { mergeVueConfig } from "./frame/vue";
 
 export class WebpackBaseConfig {
     public config = new Config();
@@ -25,7 +28,6 @@ export class WebpackBaseConfig {
             .set('@', path.resolve(root, "./src"));
 
         this.injectRules();
-        this.injectPlugins();
     }
 
     public get configuration() {
@@ -115,13 +117,64 @@ export class WebpackBaseConfig {
             })
             .end();
     }
+}
+
+export class WebpackMainConfig extends WebpackBaseConfig {
+    public constructor() {
+        super();
+        const { config } = this;
+        config
+            .entry("main")
+            .add(localConfig.main)
+            .end();
+        config.plugin('progress')
+            .use(WebpackBar, [{
+                name: 'Main',
+                color: '#555cfd'
+            }]);
+    }
+}
+
+export class WebpackUIConfig extends WebpackBaseConfig {
+    public constructor() {
+        super();
+        const { ui, chainWebpack, frame } = localConfig;
+        if (!ui) return;
+        const { config } = this;
+        config
+            .entry("ui")
+            .add(ui)
+            .end();
+        this.injectPlugins();
+
+        if (frame === 'vue') {
+            mergeVueConfig(config);
+        }
+
+        chainWebpack && chainWebpack(config);
+    }
 
     public injectPlugins() {
         this.config
             .plugin('progress')
             .use(WebpackBar, [{
-                name: 'plugin',
+                name: 'UI',
                 color: 'green'
+            }])
+            .end()
+            .plugin('html')
+            .use(HtmlWebpackPlugin, [{
+                template: "ui.html",
+                filename: "ui.html",
+                inject: 'body',
+                cache: false,
+            }])
+            .end()
+            .plugin('inline-script')
+            .use(HtmlInlineScriptPlugin, [{
+                scriptMatchPattern: [/ui.js$/],
+                htmlMatchPattern: [/ui.html$/],
+                // ignoredScriptMatchPattern: [/main.js$/]
             }])
             .end();
     }

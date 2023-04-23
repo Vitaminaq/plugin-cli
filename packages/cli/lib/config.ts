@@ -1,4 +1,5 @@
 import { loadConfig } from 'c12'
+import { createHooks } from 'hookable';
 
 export const root = process.cwd();
 
@@ -9,11 +10,13 @@ interface UserConfig {
     manifest: string;
     chainWebpack?: Function;
     configureWebpack?: Object | Function;
+    frame?: 'vue' | 'react' | 'none';
 }
 
 export const localConfig: UserConfig = {
     main: "./main.ts",
-    manifest: "./manifest.json"
+    manifest: "./manifest.json",
+    frame: 'vue'
 };
 
 export const loadUserConfig = async () => {
@@ -30,4 +33,18 @@ export const loadUserConfig = async () => {
     Object.assign(localConfig, config);
 }
 
+export const overwriteEnv = (isBuild: boolean) => {
+    process.env.NODE_ENV = isBuild ? 'production' : 'development';
+}
+
+export const isBuild = process.env.NODE_ENV === 'production';
+
 export const defineConfig = (config: UserConfig) => {};
+
+export type UpdateName = 'manifest' | 'main' | 'ui';
+
+interface Hooks {
+    'update': (name: UpdateName, content: string) => any;
+}
+
+export const hooks = createHooks<Hooks>();

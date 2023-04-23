@@ -1,34 +1,27 @@
-import { WebpackBaseConfig } from './config/base';
-import { createDevCompiler, createBuildCompiler } from "./compiler/compiler";
+import { WebpackUIConfig, WebpackMainConfig } from './config';
+import { compilerMain, compilerUI, watchManifest } from "./compiler/compiler";
 import rimraf from "rimraf";
-import { mergeVueConfig } from "./frame/vue";
+import { localConfig, isBuild } from "../config";
 
-export const devCompiler = () => {
-    const webpackDevConfig = new WebpackBaseConfig();
+export const compiler = () => {
+    const uiConfig = new WebpackUIConfig();
+    const mainConfig = new WebpackMainConfig();
 
-    mergeVueConfig(webpackDevConfig.config);
-
-    const { configuration } = webpackDevConfig;
-    if (configuration.output && configuration.output.path) {
-        rimraf.sync(configuration.output.path);
+    const { configuration: mainConfiguration } = mainConfig;
+    if (mainConfiguration.output && mainConfiguration.output.path) {
+        rimraf.sync(mainConfiguration.output.path);
     }
 
-    return createDevCompiler({
-        configuration
-    });
-}
+    compilerMain(mainConfiguration);
 
-export const buildCompiler = () => {
-    const webpackBuildConfig = new WebpackBaseConfig();
+    if (localConfig.ui) {
+        const { configuration: uiConfiguration } = uiConfig;
 
-    mergeVueConfig(webpackBuildConfig.config);
-
-    const { configuration } = webpackBuildConfig;
-    if (configuration.output && configuration.output.path) {
-        rimraf.sync(configuration.output.path);
+        if (uiConfiguration.output && uiConfiguration.output.path) {
+            rimraf.sync(uiConfiguration.output.path);
+        }
+        compilerUI(uiConfiguration);
     }
 
-    return createBuildCompiler({
-        configuration
-    });
+    !isBuild && watchManifest();
 }

@@ -2,10 +2,6 @@
   "name": "plugin-demo",
   "version": "1.0.0",
   "description": "plugin demo",
-  "main": "index.js",
-  "sideEffects": [
-    "./core.ts"
-  ],
   "scripts": {
     "dev": "plugin-cli dev",
     "build": "plugin-cli build"

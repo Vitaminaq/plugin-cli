@@ -7,7 +7,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
-const count = ref(1);
+const count = ref(10);
 
 const onClick = () => {
     count.value ++;

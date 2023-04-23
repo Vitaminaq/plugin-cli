@@ -7,7 +7,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "dev": "jiti dev-server",
+    "dev": "jiti index.ts",
     "build": "tsup"
   },
   "author": "",
@@ -39,5 +39,8 @@
     "webpack-chain": "^6.5.1",
     "webpackbar": "^5.0.2",
     "ws": "^8.13.0"
+  },
+  "dependencies": {
+    "hookable": "^5.5.3"
   }
 }

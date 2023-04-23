@@ -1,4 +1,5 @@
 import { WebSocketServer, type WebSocket } from 'ws';
+import { hooks } from "../config";
 
 export class DevServer {
     private static _instance: DevServer;
@@ -35,15 +36,19 @@ export class DevServer {
         wss.on('error', (e: Error & { code: string }) => {
             console.log("========= wss error ==========", e);
         });
+
+        this.subUpdate();
     }
 
-    public update(name: string, content: string) {
-        const msg = this.messages.get(name);
-        if (msg && msg === content) return;
-        this.messages.set(name, content);
-        this.pool.forEach(socket => socket.send(JSON.stringify({
-            name,
-            content
-        })));
+    private subUpdate() {
+        return hooks.hook('update', (name, content) => {
+            const msg = this.messages.get(name);
+            if (msg && msg === content) return;
+            this.messages.set(name, content);
+            this.pool.forEach(socket => socket.send(JSON.stringify({
+                name,
+                content
+            })));
+        })
     }
 }
