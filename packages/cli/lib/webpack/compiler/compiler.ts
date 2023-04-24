@@ -57,8 +57,9 @@ export const compilerMain = (configuration: webpack.Configuration) => {
 
     compiler.run((err, stats) => {
       printStats(err, stats, "Main");
-      if (isBuild) return;
+
       compiler.close(() => {
+        if (isBuild) return console.log(chalk.green("Main build finished !!!"));
         const mainCode = readMFSFile(serverMfs, compiler.outputPath, "main.js");
         hooks.callHook("update", "main", mainCode);
       });
@@ -83,7 +84,7 @@ export const compilerUI = (configuration: webpack.Configuration) => {
     return compiler.run((err, stats) => {
       printStats(err, stats, "UI");
       compiler.close(() => {
-        console.log(chalk.green("build finished !!!"));
+        console.log(chalk.green("UI build finished !!!"));
       });
     });
   return compiler.watch({}, (err, stats) => {

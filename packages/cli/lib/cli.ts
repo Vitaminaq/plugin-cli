@@ -1,7 +1,7 @@
 import { cac } from "cac";
 import { DevServer } from './dev-server/server';
 import { compiler } from './webpack/service';
-import { loadUserConfig } from './config';
+import { loadUserConfig, overwriteEnv } from './config';
 
 const cli = cac("plugin-cli");
 
@@ -17,6 +17,7 @@ cli
 cli
     .command("build [root]")
     .action(async () => {
+        overwriteEnv(true);
         await loadUserConfig();
         compiler();
     });

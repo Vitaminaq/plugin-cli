@@ -1,0 +1,43 @@
+{
+	"name": "figmap",
+	"version": "1.0.0",
+	"description": "This plugin template uses Typescript. If you are familiar with Javascript, Typescript will look very familiar. In fact, valid Javascript code is already valid Typescript code.",
+	"license": "ISC",
+	"scripts": {
+		"dev": "plugin-cli dev",
+		"build": "plugin-cli build",
+		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' "
+	},
+	"dependencies": {
+		"gpxparser": "^3.0.8",
+		"mapbox-gl": "^2.14.1",
+		"mixpanel-figma": "^2.0.1",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
+		"react-dropzone": "^14.2.2",
+		"react-map-gl-geocoder": "^2.1.5",
+		"viewport-mercator-project": "^7.0.1"
+	},
+	"devDependencies": {
+		"@figma/plugin-typings": "^1.33.0",
+		"@pixso/plugin-cli-beta": "workspace:*",
+		"@types/react": "^16.9.35",
+		"@types/react-dom": "^16.9.8",
+		"bootstrap": "^4.5.2",
+		"husky": "^3.0.2",
+		"lint-staged": "^9.2.1",
+		"prettier": "^1.18.2",
+		"react-map-gl": "^5.2.9"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"src/**/*.{js,jsx,ts,tsx,css,json}": [
+			"prettier --write",
+			"git add"
+		]
+	}
+}

@@ -11,13 +11,15 @@ export interface UserConfig {
     chainWebpack?: Function;
     configureWebpack?: Object | Function;
     frame?: 'vue' | 'react' | 'none';
+    template?: string;
 }
 
 export const localConfig: UserConfig = {
     main: "./main.ts",
     mainBuild: true,
     manifest: "./manifest.json",
-    frame: 'vue'
+    frame: 'vue',
+    template: 'ui.html'
 };
 
 export const loadUserConfig = async () => {
@@ -34,11 +36,12 @@ export const loadUserConfig = async () => {
     Object.assign(localConfig, config);
 }
 
-export const overwriteEnv = (isBuild: boolean) => {
-    process.env.NODE_ENV = isBuild ? 'production' : 'development';
-}
+export let isBuild = false;
 
-export const isBuild = process.env.NODE_ENV === 'production';
+export const overwriteEnv = (build: boolean) => {
+    process.env.NODE_ENV = build ? 'production' : 'development';
+    isBuild = build;
+}
 
 export const defineConfig = (config: UserConfig) => config;
 

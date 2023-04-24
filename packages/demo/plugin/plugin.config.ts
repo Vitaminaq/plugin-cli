@@ -1,7 +1,7 @@
-import { defineConfig } from "@plugin/cli";
+import { defineConfig } from "@pixso/plugin-cli-beta";
 
 export default defineConfig({
     ui: './src/index.ts',
-    main: './main.js',
-    mainBuild: false
+    main: './main.ts',
+    template: './src/ui.html'
 });

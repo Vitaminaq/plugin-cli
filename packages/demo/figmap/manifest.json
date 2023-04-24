@@ -1,0 +1,10 @@
+{
+  "name": "Figmap",
+  "id": "937760472566581732",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": [
+    "figma","figjam"
+  ]
+}

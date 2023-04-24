@@ -12,6 +12,6 @@
     "vue": "^3.2.47"
   },
   "devDependencies": {
-    "@plugin/cli": "workspace:*"
+    "@pixso/plugin-cli-beta": "workspace:*"
   }
 }
