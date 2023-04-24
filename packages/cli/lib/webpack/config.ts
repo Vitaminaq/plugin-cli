@@ -12,8 +12,8 @@ export class WebpackBaseConfig {
     public constructor() {
         const { config } = this;
         config
-            .mode(!isBuild ? "production" : 'development')
-            .devtool(!isBuild ? false : 'inline-source-map');
+            .mode(isBuild ? "production" : 'development')
+            .devtool(isBuild ? false : 'inline-source-map');
         config
             .optimization
             .usedExports(false);
