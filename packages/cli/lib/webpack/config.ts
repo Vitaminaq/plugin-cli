@@ -16,7 +16,8 @@ export class WebpackBaseConfig {
             .devtool(isBuild ? false : 'inline-source-map');
         config
             .optimization
-            .usedExports(false);
+            .usedExports(false).end();
+
         config.output
             .path(path.resolve(root, "./dist"))
             .end();
@@ -35,6 +36,8 @@ export class WebpackBaseConfig {
             .end();
 
         this.injectRules();
+
+        isBuild && this.terser();
     }
 
     public get configuration() {
@@ -111,6 +114,23 @@ export class WebpackBaseConfig {
             .options({
                 encoding: "base64"
             })
+            .end();
+    }
+
+    public terser() {
+        const TerserPlugin = require('terser-webpack-plugin')
+        this.config.optimization
+            .minimizer('terser')
+            .use(TerserPlugin, [{
+                minify: TerserPlugin.swcMinify,
+                terserOptions: {
+                    compress: {
+                        unused: true
+                    },
+                    mangle: true
+                },
+                parallel: true,
+            }])
             .end();
     }
 }
