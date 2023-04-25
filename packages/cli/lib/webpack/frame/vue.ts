@@ -12,7 +12,12 @@ export const mergeVueConfig = (config: Config) => {
         .plugin('vue-loader')
         .use(require('vue-loader').VueLoaderPlugin);
 
-    config.module.rules.get("css").uses.delete("style-loader")
+    config
+        .module
+        .rules
+        .get("css")
+        .uses
+        .delete("style-loader");
 
     config
         .module
