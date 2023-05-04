@@ -52,3 +52,5 @@ interface Hooks {
 }
 
 export const hooks = createHooks<Hooks>();
+
+export const scoketPort = 5201;

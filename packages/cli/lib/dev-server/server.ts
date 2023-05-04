@@ -1,5 +1,5 @@
 import { WebSocketServer, type WebSocket } from 'ws';
-import { hooks } from "../config";
+import { hooks, scoketPort } from "../config";
 
 export class DevServer {
     private static _instance: DevServer;
@@ -17,19 +17,28 @@ export class DevServer {
     public constructor() {
         this.subUpdate();
 
-        const wss = new WebSocketServer({ port: 3000 });
+        const wss = new WebSocketServer({ port: scoketPort });
 
         wss.on('connection', (socket) => {
             this.pool.push(socket);
 
             socket.send(JSON.stringify({ type: 'connected' }));
-
-            this.messages.forEach((content, name) => {
-                socket.send(JSON.stringify({ name, content }));
+            
+            socket.on("message", (data: any) => {
+                if (data.toString() === 'has') {
+                    socket.send('yes');
+                    this.messages.forEach((content, name) => {
+                        socket.send(JSON.stringify({ name, content }));
+                    });
+                }
             });
         
             socket.on('error', (err) => {
-                console.log("========== error ============", err);
+                console.log("scoket error", err);
+                this.remove(socket);
+            });
+            socket.on('close', () => {
+                this.remove(socket);
             });
         });
         
@@ -49,5 +58,11 @@ export class DevServer {
                 content
             })));
         })
+    }
+
+    private remove(socket: WebSocket) {
+        const idx = this.pool.indexOf(socket);
+        if (idx === -1) return;
+        this.pool.splice(idx, 1);
     }
 }
