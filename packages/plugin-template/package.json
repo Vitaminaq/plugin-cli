@@ -1,0 +1,27 @@
+{
+  "name": "@pixso/plugin-template",
+  "version": "1.0.0",
+  "description": "plugin template",
+  "bin": {
+    "create-pixso-plugin": "index.js",
+    "create-pp": "index.js"
+  },
+  "files": [
+    "index.js",
+    "template-*"
+  ],
+  "main": "index.js",
+  "keywords": [
+    "pixso",
+    "pixso-plugin",
+    "pixso-plugin-cli"
+  ],
+  "author": "xiaopf@300624.cn",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^10.1.0",
+    "kolorist": "^1.5.1",
+    "minimist": "^1.2.6",
+    "prompts": "^2.4.2"
+  }
+}
