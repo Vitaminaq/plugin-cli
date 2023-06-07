@@ -12,6 +12,7 @@
     "vue": "^3.2.47"
   },
   "devDependencies": {
-    "@pixso/plugin-cli-beta": "workspace:*"
+    "@pixso/plugin-cli-beta": "workspace:*",
+    "webpack-hot-middleware": "^2.25.3"
   }
 }

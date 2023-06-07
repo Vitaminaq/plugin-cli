@@ -1,6 +1,5 @@
 import { cac } from "cac";
-import { DevServer } from './dev-server/server';
-import { compiler } from './webpack/service';
+import { compiler } from './webpack';
 import { loadUserConfig, overwriteEnv } from './config';
 
 const cli = cac("plugin-cli");
@@ -10,7 +9,6 @@ cli
     .alias("dev")
     .action( async () => {
         await loadUserConfig();
-        DevServer.instance;
         compiler();
     });
 

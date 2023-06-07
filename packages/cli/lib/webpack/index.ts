@@ -2,6 +2,7 @@ import { WebpackUIConfig, WebpackMainConfig } from './config';
 import { compilerMain, compilerUI, watchManifest, watchMain } from "./compiler/compiler";
 import rimraf from "rimraf";
 import { localConfig, isBuild } from "../config";
+import { setupDevServer } from './dev-server';
 
 export const compiler = () => {
     const uiConfig = new WebpackUIConfig();
@@ -18,12 +19,10 @@ export const compiler = () => {
 
     if (ui) {
         const { configuration: uiConfiguration } = uiConfig;
-
-        if (uiConfiguration.output && uiConfiguration.output.path) {
-            rimraf.sync(uiConfiguration.output.path);
-        }
-        compilerUI(uiConfiguration);
+        isBuild ? compilerUI(uiConfiguration) : setupDevServer();
     }
 
     !isBuild && watchManifest();
 }
+
+

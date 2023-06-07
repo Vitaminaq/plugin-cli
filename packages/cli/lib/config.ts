@@ -19,7 +19,7 @@ export const localConfig: UserConfig = {
     mainBuild: true,
     manifest: "./manifest.json",
     frame: 'vue',
-    template: 'ui.html'
+    template: 'ui.html',
 };
 
 export const loadUserConfig = async () => {
@@ -53,4 +53,4 @@ interface Hooks {
 
 export const hooks = createHooks<Hooks>();
 
-export const scoketPort = 5201;
+export const servicePort = 5201;

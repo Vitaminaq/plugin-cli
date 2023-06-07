@@ -5,15 +5,15 @@ import { getQuickJS, shouldInterruptAfterDeadline  } from "quickjs-emscripten"
 onMounted(() => {
   const contain: any = document.querySelector('#plugin-runtime-contain');
 
-  const socket = new WebSocket('ws://127.0.0.1:3000/');
+  const socket = new WebSocket('ws://127.0.0.1:5201/plugin');
 
   socket.addEventListener('message', function (event) {
     const data: any = JSON.parse(event.data);
 
     if (!data.name) return;
 
-      if (data.name === 'ui-html') {
-        console.log('ui-html');
+      if (data.name === 'ui') {
+        console.log('ui');
 
         if (contain) {
           contain.src = window.URL.createObjectURL(new Blob([data.content], { type: 'text/html' }));

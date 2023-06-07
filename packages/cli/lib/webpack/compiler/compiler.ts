@@ -71,14 +71,21 @@ export const compilerMain = (configuration: webpack.Configuration) => {
   watchFile((configuration.entry as any).main[0], build);
 };
 
+const uiHtml = `<html>
+<head>
+    <title>pixso plugin debug</title>
+    <style>
+      iframe {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+</head>
+<body><iframe src="http://localhost:5201"></iframe></body>
+</html>`;
+
 export const compilerUI = (configuration: webpack.Configuration) => {
   const compiler = webpack(configuration);
-
-  let serverMfs: MFS;
-  if (!isBuild) {
-    serverMfs = new MFS();
-    compiler.outputFileSystem = serverMfs;
-  }
 
   if (isBuild)
     return compiler.run((err, stats) => {
@@ -87,11 +94,15 @@ export const compilerUI = (configuration: webpack.Configuration) => {
         console.log(chalk.green("UI build finished !!!"));
       });
     });
-  return compiler.watch({}, (err, stats) => {
-    if (!printStats(err, stats, "UI")) return;
 
-    const uiHtml = readMFSFile(serverMfs, compiler.outputPath, "ui.html");
-
+  compiler.hooks.done.tap("pixso-plugin-cli", async (stats) => {
+    if (!printStats(null, stats, "UI")) return;
     hooks.callHook("update", "ui", uiHtml);
   });
+
+  compiler.hooks.failed.tap("pixso-plugin-cli", (error) => {
+    console.log(chalk.red("Client compilation failed"));
+    console.error(error);
+  });
+  return compiler;
 };

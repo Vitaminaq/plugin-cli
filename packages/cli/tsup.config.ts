@@ -28,5 +28,8 @@ export default defineConfig({
     "rimraf",
     "hookable",
     "c12",
+    "webpack-dev-middleware",
+    "webpack-hot-middleware",
+    "express"
   ],
 });
