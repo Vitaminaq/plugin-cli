@@ -7,7 +7,7 @@ import { pluginScoket } from './middleware';
 import { WebpackUIConfig } from "./config";
 import { compilerUI } from "./compiler/compiler";
 
-export const setupUIDevServer = () => {
+export const setupDevServer = () => {
     const app = express();
 
     const config = new WebpackUIConfig().configuration;
@@ -36,7 +36,3 @@ export const setupUIDevServer = () => {
 
     eWsApp.listen(servicePort);
 }
-
-export const setupDevServer = () => {
-    setupUIDevServer();
-};
