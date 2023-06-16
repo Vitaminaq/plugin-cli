@@ -20,6 +20,7 @@ export default defineConfig({
     "svg-url-loader",
     "css-loader",
     "style-loader",
+    "svelte-loader",
     "html-webpack-plugin",
     "esbuild",
     "webpack-chain",
@@ -30,6 +31,7 @@ export default defineConfig({
     "c12",
     "webpack-dev-middleware",
     "webpack-hot-middleware",
-    "express"
+    "express",
+    "webpack-merge"
   ],
 });

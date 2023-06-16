@@ -18,5 +18,8 @@
     "url": "https://github.com/Vitaminaq/plugin-cli/issues"
   },
   "homepage": "https://github.com/Vitaminaq/plugin-cli#readme",
-  "packageManager": "pnpm"
+  "packageManager": "pnpm",
+  "devDependencies": {
+    "webpack-hot-middleware": "^2.25.3"
+  }
 }

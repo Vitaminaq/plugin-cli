@@ -10,7 +10,7 @@ export interface UserConfig {
     manifest?: string;
     chainWebpack?: Function;
     configureWebpack?: Object | Function;
-    frame?: 'vue' | 'react' | 'none';
+    frame?: 'vue' | 'react' | 'svelte' |'none';
     template?: string;
 }
 

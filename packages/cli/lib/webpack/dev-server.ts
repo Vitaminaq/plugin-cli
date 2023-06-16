@@ -4,13 +4,10 @@ import webpackDevMiddleware from "webpack-dev-middleware";
 import webpackHotMiddleware from "webpack-hot-middleware";
 import { servicePort } from "../config";
 import { pluginScoket } from './middleware';
-import { WebpackUIConfig } from "./config";
 import { compilerUI } from "./compiler/compiler";
 
-export const setupDevServer = () => {
+export const setupDevServer = (config: webpack.Configuration) => {
     const app = express();
-
-    const config = new WebpackUIConfig().configuration;
 
     config.plugins?.push(new webpack.HotModuleReplacementPlugin());
 

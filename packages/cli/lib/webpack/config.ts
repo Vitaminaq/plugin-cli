@@ -5,6 +5,7 @@ import { root, localConfig, isBuild } from "../config";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import HtmlInlineScriptPlugin from "./plugin/html-inline-scripts";
 import { mergeVueConfig } from "./frame/vue";
+import { mergeSvelteConfig } from "./frame/svelte";
 
 export class WebpackBaseConfig {
   public config = new Config();
@@ -14,13 +15,25 @@ export class WebpackBaseConfig {
     config
       .mode(isBuild ? "production" : "development")
       .devtool(isBuild ? false : "inline-source-map");
-    config.optimization.usedExports(false).end();
 
-    config.output.path(path.resolve(root, "./dist")).clear().end();
-    config.resolve.extensions
+    config
+      .optimization
+      .usedExports(false)
+      .end();
+
+    config
+      .output
+      .path(path.resolve(root, "./dist"))
+      .clear()
+      .end();
+
+    config
+      .resolve
+      .extensions
       .merge([".ts", ".tsx", ".mjs", ".js", ".jsx", ".vue", ".json", ".wasm"])
       .end()
-      .alias.set("@", path.resolve(root, "./src"));
+      .alias
+      .set("@", path.resolve(root, "./src"));
 
     isBuild && config.performance
       .hints(false)
@@ -42,7 +55,8 @@ export class WebpackBaseConfig {
     config.module
       .rule("js")
       .test(/\.(j|t)sx?$/)
-      .exclude.add(/node_modules/)
+      .exclude
+      .add(/node_modules/)
       .end()
       .use("swc")
       .loader(require.resolve("swc-loader"))
@@ -154,8 +168,16 @@ export class WebpackUIConfig extends WebpackBaseConfig {
       .end();
     this.injectPlugins();
 
-    if (frame === "vue") {
-      mergeVueConfig(config);
+
+    switch(frame) {
+      case "vue":
+        mergeVueConfig(config);
+        break;
+      case "svelte":
+        mergeSvelteConfig(config);
+        break;
+      default:
+        break;
     }
 
     chainWebpack && chainWebpack(config);
